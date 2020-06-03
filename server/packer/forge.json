@@ -1,0 +1,50 @@
+{
+    "min_packer_version": "1.5.6",
+    "variables": {},
+    "builders": [
+        {
+            "ami_name": "minecraft-forge-{{isotime \"06-01-02-1504\"}}",
+            "ami_description": "An Ubuntu 18.04 AMI with java and forge management scripts.",
+            "instance_type": "t3.large",
+            "name": "ubuntu18-ami",
+            "region": "eu-west-2",
+            "subnet_id": "subnet-0c150d5e42963fdb5",
+            "type": "amazon-ebs",
+            "tags": {
+                "product": "minecraft-forge"
+            },
+            "source_ami_filter": {
+                "filters": {
+                    "virtualization-type": "hvm",
+                    "architecture": "x86_64",
+                    "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+                    "block-device-mapping.volume-type": "gp2",
+                    "root-device-type": "ebs"
+                },
+                "owners": [
+                    "099720109477"
+                ],
+                "most_recent": true
+            },
+            "ssh_username": "ubuntu"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "scripts/install.sh",
+            "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
+            "pause_before": "30s"
+        },
+        {
+            "type": "file",
+            "source": "files/backup.sh",
+            "destination": "/home/ubuntu/backup.sh"
+        },
+        {
+            "type": "file",
+            "source": "files/run.sh",
+            "destination": "/home/ubuntu/run.sh"
+        }
+    ]
+}
